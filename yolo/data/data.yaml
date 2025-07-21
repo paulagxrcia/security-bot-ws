@@ -1,0 +1,13 @@
+train: /home/paula/security_bot_ws/src/yolo/train/images
+val: /home/paula/security_bot_ws/src/yolo/valid/images
+test: /home/paula/security_bot_ws/src/yolo/test/images
+
+nc: 1
+names: ['person']
+
+roboflow:
+  workspace: leo-ueno
+  project: people-detection-o4rdr
+  version: 9
+  license: Private
+  url: https://universe.roboflow.com/leo-ueno/people-detection-o4rdr/dataset/9

@@ -1,0 +1,17 @@
+twist_mux:
+  ros__parameters:
+    use_stamped: false
+    topics:
+      auto:
+        topic: /cmd_vel_teleop
+        timeout: 0.5
+        priority: 100
+      tracking:
+        topic: /cmd_vel_tracking
+        timeout: 0.5
+        priority: 20
+      teleop:
+        topic: /cmd_vel_teleop
+        timeout: 0.5
+        priority: 5
+
