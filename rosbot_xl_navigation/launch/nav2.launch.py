@@ -87,8 +87,8 @@ def generate_launch_description():
 
         Node(
             package = 'rosbot_xl_behaviour',
-            executable = 'initial_pose_pub',
-            name = 'initial_pose_pub'
+            executable = 'initial_pose_pub_node',
+            name = 'initial_pose_pub_node'
         )
     ])
 

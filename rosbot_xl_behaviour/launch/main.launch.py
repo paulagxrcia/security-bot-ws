@@ -9,15 +9,16 @@ def generate_launch_description():
 
         Node(
             package='rosbot_xl_behaviour',
-            executable='security_patrol',
+            executable='security_patrol_node',
             name='security_patrol_node',
-            remappings =[('/cmd_vel', '/cmd_vel_patrol')]
+            remappings =[('/cmd_vel', '/cmd_vel_nav2')]
         ),
 
         Node(
             package='rosbot_xl_behaviour',
-            executable ='shelf_inspection',
-            name='shelf_inspection_node'
+            executable ='shelf_inspection_node',
+            name='shelf_inspection_node',
+            remappings=[('/cmd_vel', '/cmd_vel_nav2')]
         ),
 
         Node(
@@ -35,8 +36,8 @@ def generate_launch_description():
 
         Node(
             package='rosbot_xl_behaviour',
-            executable='human_tracking',
-            name='intruder_tracking',
+            executable='human_tracking_node',
+            name='human_tracking_node',
             remappings=[('/cmd_vel', '/cmd_vel_tracking')]
         ),
 
@@ -68,12 +69,6 @@ def generate_launch_description():
             remappings=[('/cmd_vel_out', '/cmd_vel')]
         ),
 
-        # Node(
-        #     package='rosbot_xl_behaviour',
-        #     executable='control_node',
-        #     name='control_node',
-        #     prefix='xterm -e'
-        # ),
 
         ExecuteProcess(
             cmd=[

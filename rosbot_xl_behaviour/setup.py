@@ -23,13 +23,13 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'shelf_inspection = rosbot_xl_behaviour.shelf_inspection_node:main', 
-            'security_patrol = rosbot_xl_behaviour.security_patrol_node:main',
+            'shelf_inspection_node = rosbot_xl_behaviour.shelf_inspection_node:main', 
+            'security_patrol_node = rosbot_xl_behaviour.security_patrol_node:main',
             'alarm_alert_node = rosbot_xl_behaviour.alarm_alert_node:main',
-            'human_tracking = rosbot_xl_behaviour.human_tracking:main',
+            'human_tracking_node = rosbot_xl_behaviour.human_tracking:main',
             'video_capture_node = rosbot_xl_behaviour.video_capture_node:main',
             'intruder_recorder_node = rosbot_xl_behaviour.intruder_recorder_node:main',
-            'initial_pose_pub = rosbot_xl_behaviour.initial_pose_pub:main',
+            'initial_pose_pub_node  = rosbot_xl_behaviour.initial_pose_pub:main',
             'control_node = rosbot_xl_behaviour.control:main'
 
 

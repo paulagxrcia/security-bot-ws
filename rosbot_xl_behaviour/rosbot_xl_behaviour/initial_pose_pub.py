@@ -15,7 +15,7 @@ class InitialPosePublisher(Node):
         )
 
         self.timer = self.create_timer(
-            10.0,
+            15.0,
             self.publish_initial_pose
         )
 

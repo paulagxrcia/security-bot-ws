@@ -5,7 +5,6 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import (
     Command,
-    EnvironmentVariable,
     FindExecutable,
     LaunchConfiguration,
     PathJoinSubstitution,
@@ -53,10 +52,10 @@ def launch_setup(context, *args, **kwargs):
         parameters=[robot_description],
     )
 
-    joint_state_publisher_gui = Node(
-        package="joint_state_publisher_gui",
-        executable="joint_state_publisher_gui",
-        name="joint_state_publisher_gui",
+    joint_state_publisher = Node(
+        package="joint_state_publisher",
+        executable="joint_state_publisher",
+        name="joint_state_publisher",
         output="screen",
     )
 
@@ -65,7 +64,7 @@ def launch_setup(context, *args, **kwargs):
         SetRemap("/tf", "tf"),
         SetRemap("/tf_static", "tf_static"),
         robot_state_pub_node,
-        joint_state_publisher_gui,
+        joint_state_publisher
     ]
 
 def generate_launch_description():
@@ -105,7 +104,7 @@ def generate_launch_description():
         arguments=[
             "-d",
             PathJoinSubstitution(
-                [FindPackageShare("rosbot_xl_description"), "rviz", "rosbot.rviz"]
+                [FindPackageShare("rosbot_xl_description"), "rviz", "rvizconfig.rviz"]
             ),
         ],
     )

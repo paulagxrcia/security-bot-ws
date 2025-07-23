@@ -44,9 +44,9 @@ class IntruderRecorderNode(Node):
             self.person_detected_count = 0
 
         # Confirmar detección solo si se detecta persona 3 veces seguidas
-        if self.person_detected_count >= 3:
+        if self.person_detected_count >= 5:
             if not self.recording:
-                self.get_logger().info('Intruso confirmado tras 3 detecciones seguidas, iniciando grabación...')
+                self.get_logger().info('Intruso confirmado tras 5 detecciones seguidas, iniciando grabación...')
                 self.call_recording_service(True)
                 self.recording = True
 

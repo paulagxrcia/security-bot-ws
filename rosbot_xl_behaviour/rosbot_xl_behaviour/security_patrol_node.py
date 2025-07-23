@@ -3,9 +3,7 @@ from rclpy.node import Node
 from std_srvs.srv import Trigger
 from geometry_msgs.msg import PoseStamped
 from copy import deepcopy
-import time
 from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
-
 
 class SecurityPatrolNode(Node):
     def __init__(self):
@@ -15,8 +13,8 @@ class SecurityPatrolNode(Node):
         self.navigator = None
 
         self.start_srv = self.create_service(
-            Trigger, 
-            '/start_patrolling', 
+            Trigger,
+            '/start_patrolling',
             self.start_patrol_callback)
 
         self.stop_srv = self.create_service(
@@ -25,6 +23,18 @@ class SecurityPatrolNode(Node):
             self.stop_patrol_callback)
 
         self.get_logger().info('Servicios /start_patrolling y /stop_patrolling listos.')
+
+        self.security_route = [
+            [0.5845, -11.4295],
+            [1.3253, 4.8699],
+            [-3.4750, 4.8107],
+            [-3.4750, -11.3110]
+        ]
+
+        self.route_poses = []
+
+        self.timer_period = 0.5  # segundos
+        self.timer = self.create_timer(self.timer_period, self.patrol_loop)
 
     def start_patrol_callback(self, request, response):
         if self.patrolling:
@@ -36,48 +46,26 @@ class SecurityPatrolNode(Node):
         self.patrolling = True
 
         self.navigator = BasicNavigator()
+        self.get_logger().info('⏳ Esperando a que Nav2 esté activo...')
         self.navigator.waitUntilNav2Active()
+        self.get_logger().info('✅ Nav2 está activo.')
 
-        security_route = [
-            [0.5845, -11.4295],
-            [1.3253, 4.8699],
-            [-3.4750, 4.8107],
-            [-3.4750, -11.3110]
-        ]
-
-        route_poses = []
+        self.route_poses = []
         pose = PoseStamped()
         pose.header.frame_id = 'map'
         pose.pose.orientation.w = 1.0
 
-        for pt in security_route:
+        for pt in self.security_route:
             pose.pose.position.x = pt[0]
             pose.pose.position.y = pt[1]
             pose.header.stamp = self.navigator.get_clock().now().to_msg()
-            route_poses.append(deepcopy(pose))
+            self.route_poses.append(deepcopy(pose))
 
-        self.navigator.goThroughPoses(route_poses)
+        # Enviar toda la ruta con goThroughPoses
+        self.navigator.goThroughPoses(self.route_poses)
 
-        while not self.navigator.isTaskComplete():
-            if not self.patrolling:
-                self.get_logger().warn('⚠️ Patrullaje cancelado por el usuario.')
-                self.navigator.cancelTask()
-                while not self.navigator.isTaskComplete():
-                    time.sleep(0.5)
-                response.success = False
-                response.message = 'Patrulla cancelada manualmente.'
-                return response
-            time.sleep(0.5)
-
-        result = self.navigator.getResult()
-        if result != TaskResult.SUCCEEDED:
-            response.success = False
-            response.message = 'La patrulla falló o fue cancelada.'
-        else:
-            response.success = True
-            response.message = 'Patrulla completada correctamente.'
-
-        self.patrolling = False
+        response.success = True
+        response.message = 'Patrulla iniciada.'
         return response
 
     def stop_patrol_callback(self, request, response):
@@ -85,19 +73,37 @@ class SecurityPatrolNode(Node):
             response.success = False
             response.message = 'No hay patrulla en ejecución.'
         else:
+            self.get_logger().warn('⚠️ Deteniendo patrulla manualmente...')
             self.patrolling = False
+
+            if self.navigator is not None:
+                self.navigator.cancelTask()
+
             response.success = True
-            response.message = 'Cancelando patrulla en curso...'
+            response.message = 'Patrulla cancelada.'
         return response
 
+    def patrol_loop(self):
+        if not self.patrolling or self.navigator is None:
+            return
+
+        if self.navigator.isTaskComplete():
+            result = self.navigator.getResult()
+            if result == TaskResult.SUCCEEDED:
+                self.get_logger().info('✅ Patrulla completada correctamente.')
+            elif result == TaskResult.CANCELED:
+                self.get_logger().info('⛔ Patrulla cancelada.')
+            else:
+                self.get_logger().error('❌ Patrulla fallida.')
+
+            self.patrolling = False
 
 def main(args=None):
     rclpy.init(args=args)
     node = SecurityPatrolNode()
     rclpy.spin(node)
+    node.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()
-
